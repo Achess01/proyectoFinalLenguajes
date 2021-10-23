@@ -25,7 +25,7 @@ public class State{
     }
 
    
-    public void addNext(Alphabet alphabet, State state){
+    public void addNext(Alphabet alphabet, State state){        
         nextStates.put(alphabet.getId(), state);
         nextAlphabet.add(alphabet.getId());
     }
@@ -66,11 +66,13 @@ public class State{
     public String nextValues(){
         String sig = "Se esperaba ";
         for(String alphabet : nextAlphabet){
-            sig += alphabet + ", ";
+            if(!alphabet.equals(Alphabet.SEPARADOR.getId())){                            
+                sig += alphabet + ", ";
+            }
         }
         int last = sig.lastIndexOf(",");
         if(last > 0){
-            sig = sig.substring(0, last - 1);
+           sig = sig.substring(0, last);
         }
         return sig;
     }

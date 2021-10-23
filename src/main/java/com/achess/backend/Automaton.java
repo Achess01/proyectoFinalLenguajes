@@ -25,6 +25,7 @@ public class Automaton implements Automatons{
         State q7 = new State(TokenType.LITERAL);
         State q8 = new State();
         State q9 = new State(TokenType.COMENTARIO);
+        q9.setFinalState(true);
         State q10 = new State(TokenType.ASIGNACION);
         q10.setFinalState(true);
         State q11 = new State(TokenType.SUMA);
@@ -37,7 +38,7 @@ public class Automaton implements Automatons{
         q14.setFinalState(true);
         
         q0.addNext(Alphabet.CERO, q1);
-        q0.addNext(Alphabet.NUMERO, q3);
+        q0.addNext(Alphabet.DIGITO, q3);
         q0.addNext(Alphabet.LETRA, q4);
         q0.addNext("-", q2);
         q0.addNext("_", q4);
@@ -52,34 +53,36 @@ public class Automaton implements Automatons{
         
         q1.addNext(Alphabet.SEPARADOR, q0);
         
-        q2.addNext(Alphabet.NUMERO, q3);
+        q2.addNext(Alphabet.DIGITO, q3);
         q2.addNext(Alphabet.SEPARADOR, q0); // Tal vez estado final
         
         q3.addNext(Alphabet.CERO, q3);
-        q3.addNext(Alphabet.NUMERO, q3);
+        q3.addNext(Alphabet.DIGITO, q3);
         q3.addNext(Alphabet.SEPARADOR, q0);
         
         q4.addNext(Alphabet.CERO, q4);
-        q4.addNext(Alphabet.NUMERO, q4);
+        q4.addNext(Alphabet.DIGITO, q4);
         q4.addNext(Alphabet.LETRA, q4);
         q4.addNext("-", q4);
         q4.addNext("_", q4);
         q4.addNext(Alphabet.SEPARADOR, q0);
         
         q5.addNext(Alphabet.CERO, q6);
-        q5.addNext(Alphabet.NUMERO, q6);
+        q5.addNext(Alphabet.DIGITO, q6);
         q5.addNext(Alphabet.LETRA, q6);
         q5.addNext(Alphabet.CHR_LITERAL, q6);
         q5.addNext(" ", q6);
-        q5.addNext(Alphabet.SEPARADOR, q6);
+        //q5.addNext("\t", q6);
+        q5.addNext(Alphabet.SEPARADOR, q0);
         
         q6.addNext(Alphabet.CERO, q6);
-        q6.addNext(Alphabet.NUMERO, q6);
+        q6.addNext(Alphabet.DIGITO, q6);
         q6.addNext(Alphabet.LETRA, q6);
         q6.addNext(Alphabet.CHR_LITERAL, q6);
         q6.addNext(" ", q6);
         q6.addNext("\"", q7);
-        q6.addNext(Alphabet.SEPARADOR, q6);
+        //q6.addNext("\t", q6);
+        q6.addNext(Alphabet.SEPARADOR, q0);
         
         q7.addNext(Alphabet.SEPARADOR, q0); //Tal vez estado final
         
@@ -116,51 +119,69 @@ public class Automaton implements Automatons{
         int index = 0;
         int row = 1;
         int column = 1;
+        boolean inComment = false;
         String lexeme = "";        
         State aux;
         State aux1;        
-        aux =  q0;
-        while(index < text.length()){
+        aux =  q0;        
+        while(index < text.length()){            
             char character = text.charAt(index);
-            aux1 = aux.getNext(character);                        
-            if(aux1 == null){
-                lexeme += character;
-                String des = aux.nextValues();
-                addTokenError(lexeme, row, column, des, index);
-                lexeme = "";
-                aux1 = q0;                
-            }
-            else if(aux1.equals(q0) && !aux.equals(q0)){                
-                if(aux.isAcceptState()){
-                    addToken(aux.getTokenType(), lexeme, row, column, index);
+            if(!inComment){                            
+                aux1 = aux.getNext(character);
+                column++;
+                if(aux1 == null){
+                    if((aux.getTokenType().equals(TokenType.NUMERO)||aux.getTokenType().equals(TokenType.IDENTIFICADOR)) && 
+                            (character == ')' || character == '+' 
+                            || character == '*' || character == '=')){
+                        addToken(aux.getTokenType(), lexeme, row, column-1, index-1);
+                        addToken(TokenType.PARENTESIS_C, String.valueOf(character), row, column, index);
+                    }else{                        
+                        lexeme += character;
+                        String des = aux.nextValues();
+                        addTokenError(lexeme, row, column, des, index);                       
+                    }
+                    lexeme = "";
+                    aux1 = q0;            
                 }
-                else{
+                else if(aux1.equals(q0) && !aux.equals(q0)){                
+                    if(aux.isAcceptState()){
+                        addToken(aux.getTokenType(), lexeme, row, column, index);
+                    }
+                    else{                        
+                        lexeme += character;
+                        String des = aux.nextValues();
+                        addTokenError(lexeme, row, column, des, index);
+                    }
+                    lexeme = "";
+                    aux1 = q0;
+                }
+                else if(aux1.isFinalState() || index == text.length() - 1){
                     lexeme += character;
-                    String des = aux.nextValues();
-                    addTokenError(lexeme, row, column, des, index);
-                }
-                lexeme = "";
-                //aux1 = q0;
+                    if(aux1.isAcceptState()){                    
+                        addToken(aux1.getTokenType(), lexeme, row, column, index);
+                        if(aux1.getTokenType().equals(TokenType.COMENTARIO)){
+                            inComment = true;
+                        }                    
+                    }else if(!aux1.equals(q0)){
+                        int a = (int) character;
+                        System.out.println(a);
+                        System.out.println("aaa");
+                        String des = aux1.nextValues();
+                        addTokenError(lexeme, row, column, des, index);
+                    }
+                    lexeme = "";
+                    aux1 = q0;
+                }else if(!aux1.equals(q0)){
+                    lexeme += character;
+                }    
+                aux = aux1;
             }
-            else if(aux1.isFinalState() || index == text.length() - 1){
-                lexeme += character;
-                if(aux1.isAcceptState()){                    
-                    addToken(aux1.getTokenType(), lexeme, row, column, index);
-                }else{
-                    String des = aux1.nextValues();
-                    addTokenError(lexeme, row, column, des, index);
-                }
-                lexeme = "";
-                aux1 = q0;
-            }else if(!aux1.equals(q0)){
-                lexeme += character;
-            }    
-            aux = aux1;
             index++;
-            column++;
+            
             if(character == '\n'){
                 row++;
                 column = 1;
+                inComment = false;
             }
             
         

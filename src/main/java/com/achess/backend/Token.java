@@ -4,7 +4,7 @@ package com.achess.backend;
  *
  * @author achess
  */
-public class Token {
+public class Token {    
     private TokenType type;
     private String lexeme;
     private int row;
@@ -14,6 +14,9 @@ public class Token {
     private int end;    
 
     public Token(TokenType type, String lexeme, int row, int column, int index) {
+        if(type.equals(TokenType.IDENTIFICADOR)){
+            type = TokenType.isReserved(lexeme, type);
+        }
         this.type = type;
         this.lexeme = lexeme;
         this.row = row;

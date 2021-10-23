@@ -5,7 +5,7 @@ package com.achess.backend;
  */
 public enum Alphabet {   
     
-    CERO("0"), NUMERO("Número entero"), SEPARADOR("Separador"), 
+    CERO("0"), DIGITO("Dígito"), SEPARADOR("Separador"), 
     CHR_LITERAL("Signo de literal"), LETRA("Letra"), DESCONOCIDO("Desconocido");
    private String id;
    private Alphabet(String id){
@@ -18,7 +18,8 @@ public enum Alphabet {
    
    public static String getAlpabhet(char chr){       
         int value = (int)chr;
-        if(value == 32 || value == 10 || value == 9){
+        //Using ascii
+        if(value == 32 || value == 10 || value == 9 || value == 13 ||value == 12){
             return SEPARADOR.getId();
         }
         else if(value >= 65 && value <= 90 || value >= 97 && value <= 122){
@@ -28,7 +29,7 @@ public enum Alphabet {
             return CERO.getId();
         }
         else if(Character.isDigit(chr)){
-            return NUMERO.getId();
+            return DIGITO.getId();
         }
         else if(chr == '+' ||chr == '-' ||chr == '/' ||
                 chr == '(' ||chr == ')' ||chr == '_' ||

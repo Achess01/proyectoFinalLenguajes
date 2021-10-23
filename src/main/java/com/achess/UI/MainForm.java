@@ -92,7 +92,7 @@ public class MainForm extends javax.swing.JFrame {
         }        
     }
     
-    private void openFile(){
+     private void openFile(){
         JFileChooser upload = new JFileChooser();
         FileNameExtensionFilter filtro = new FileNameExtensionFilter("txt","txt");
         upload.setFileFilter(filtro);
@@ -123,6 +123,83 @@ public class MainForm extends javax.swing.JFrame {
                     ex.printStackTrace(System.out);
                 }                
             }
+    }
+    
+     
+     //Pruebas borrar***
+    private String openFilePrueba(){       
+        FileReader fr = null;
+        String text = "";
+        try{
+            File file = new File("/home/achess/pruebas.txt");
+            fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);                        
+            String line;                     
+            while((line = br.readLine()) != null){                
+                text += line + "\n";
+            }                        
+        }
+        catch (Exception ex){
+            JOptionPane.showMessageDialog(null, "Error al cargar el archivo");     
+        }
+        finally{
+                try{
+                    if(fr!=null){
+                    fr.close();
+                    }
+                }catch(Exception ex){
+                    ex.printStackTrace(System.out);
+                }                
+            }
+        return text;
+    }
+    
+    private void analizeTest(){
+        hideTextFound();        
+        String text = openFilePrueba();
+        if (text.length() > 0){
+           Automaton.getAutomaton().analize(text);
+           ArrayList<Token> errors = Automaton.getAutomaton().getErrors();
+           if(errors.size() > 0){
+               String errorMessage = "";
+               for (Token tk: errors){
+                   String pos = "Ln:" + tk.getRow() + " Col:" + tk.getColumn();
+                   errorMessage += "Error '"+ tk.getLexeme() + "'\ten " +pos+"\t" +tk.getDescription()+ "\n";
+               }               
+               this.textFound.setText(errorMessage);
+               showTextFound();
+           }
+           else{
+               ArrayList<Token> tokens = Automaton.getAutomaton().getTokens();
+               JDialog dialog = new DialogTokens(this, true, tokens);
+               dialog.setLocationRelativeTo(null);
+               dialog.setVisible(true);
+           }        
+        }        
+    }
+    ///
+    private void analize(){
+        hideTextFound();        
+        String text = textEditor.getText();
+        if (text.length() > 0){
+           Automaton.getAutomaton().analize(text);
+           ArrayList<Token> errors = Automaton.getAutomaton().getErrors();
+           if(errors.size() > 0){
+               String errorMessage = "";
+               for (Token tk: errors){
+                   String pos = "Ln:" + tk.getRow() + " Col:" + tk.getColumn();
+                   errorMessage += "Error '"+ tk.getLexeme() + "'\ten " +pos+"\t" +tk.getDescription()+ "\n";
+               }               
+               this.textFound.setText(errorMessage);
+               showTextFound();
+           }
+           else{
+               ArrayList<Token> tokens = Automaton.getAutomaton().getTokens();
+               JDialog dialog = new DialogTokens(this, true, tokens);
+               dialog.setLocationRelativeTo(null);
+               dialog.setVisible(true);
+           }        
+        }        
     }
     
     /**
@@ -388,27 +465,8 @@ public class MainForm extends javax.swing.JFrame {
     
     private void buttonAnalizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAnalizeActionPerformed
         // TODO add your handling code here:  
-        hideTextFound();        
-        String text = textEditor.getText();
-        if (text.length() > 0){
-           Automaton.getAutomaton().analize(text);
-           ArrayList<Token> errors = Automaton.getAutomaton().getErrors();
-           if(errors.size() > 0){
-               String errorMessage = "";
-               for (Token tk: errors){
-                   String pos = "Ln:" + tk.getRow() + " Col:" + tk.getColumn();
-                   errorMessage += "Error '"+ tk.getLexeme() + "'\ten " +pos+"\t" +tk.getDescription()+ "\n";
-               }               
-               this.textFound.setText(errorMessage);
-               showTextFound();
-           }
-           else{
-               ArrayList<Token> tokens = Automaton.getAutomaton().getTokens();
-               JDialog dialog = new DialogTokens(this, true, tokens);
-               dialog.setLocationRelativeTo(null);
-               dialog.setVisible(true);
-           }        
-        }        
+        //analize();
+        analizeTest();
     }//GEN-LAST:event_buttonAnalizeActionPerformed
 
     private void menuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSaveActionPerformed
