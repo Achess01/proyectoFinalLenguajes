@@ -484,7 +484,11 @@ public class MainForm extends javax.swing.JFrame {
         if(tokens.size() > 0 && errors.size() == 0){
             PDA automaton = PDA.getAutomaton(tokens);
             automaton.analize();
-            System.out.println(automaton.getError());
+            String error = automaton.getError();
+            if(error != ""){
+                this.textFound.setText(error);
+                showTextFound();
+            }
         }else{
             JOptionPane.showMessageDialog(null, "El análisis léxico debe completarse (sin errores)");
         }
