@@ -105,9 +105,11 @@ public class Automaton implements Automatons{
         return automaton;
     }       
     
-    private void addToken(TokenType tokenType, String lexeme, int row, int column, int index){        
-        Token tk = new Token(tokenType, lexeme, row, column, index);        
-        tokens.add(tk);
+    private void addToken(TokenType tokenType, String lexeme, int row, int column, int index){
+        if(!tokenType.equals(TokenType.COMENTARIO)){
+            Token tk = new Token(tokenType, lexeme, row, column, index);        
+            tokens.add(tk);
+        }
     }    
     
     private void addTokenError(String lexeme, int row, int column, String description, int index){
