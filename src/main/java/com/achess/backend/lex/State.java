@@ -1,5 +1,6 @@
-package com.achess.backend;
+package com.achess.backend.lex;
 
+import com.achess.backend.TokenType;
 import java.util.ArrayList;
 import java.util.HashMap;
 

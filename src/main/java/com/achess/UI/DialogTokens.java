@@ -5,7 +5,7 @@
  */
 package com.achess.UI;
 
-import com.achess.backend.Automaton;
+import com.achess.backend.lex.Automaton;
 import com.achess.backend.Token;
 import java.util.ArrayList;
 import java.util.HashMap;

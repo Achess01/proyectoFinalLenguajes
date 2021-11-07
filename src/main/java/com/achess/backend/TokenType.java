@@ -17,7 +17,8 @@ public enum TokenType {
     PARENTESIS_A("Paréntesis abrir"),PARENTESIS_C("Paréntesis cerrar"),
     ERROR("Error"), PALABRA("Palabra encontrada"),
     ESCRIBIR("ESCRIBIR"), FIN("FIN"), REPETIR("REPETIR"), INICIAR("INICIAR"),
-    SI("SI"), VERDADERO("VERDADERO"), FALSO("FALSO"), ENTONCES("ENTONCES");
+    SI("SI"), VERDADERO("VERDADERO"), FALSO("FALSO"), ENTONCES("ENTONCES"),
+    EPSILON("epsilon"), $("$");
     
     
     private static ArrayList<TokenType> reservedWords = null;

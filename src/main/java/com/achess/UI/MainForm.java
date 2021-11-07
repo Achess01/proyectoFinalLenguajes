@@ -5,9 +5,10 @@
  */
 package com.achess.UI;
 
-import com.achess.backend.Automaton;
+import com.achess.backend.lex.Automaton;
 import com.achess.backend.Token;
-import com.achess.backend.WordAutomaton;
+import com.achess.backend.lex.WordAutomaton;
+import com.achess.backend.sintaxis.PDA;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
@@ -216,6 +217,7 @@ public class MainForm extends javax.swing.JFrame {
         buttonSearch = new javax.swing.JButton();
         textWordSearch = new javax.swing.JTextField();
         labelCords = new javax.swing.JLabel();
+        buttonAnalize1 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         textEditor = new javax.swing.JTextArea();
@@ -236,7 +238,7 @@ public class MainForm extends javax.swing.JFrame {
 
         buttonAnalize.setBackground(new java.awt.Color(46, 41, 46));
         buttonAnalize.setForeground(new java.awt.Color(250, 231, 88));
-        buttonAnalize.setText("Analizar");
+        buttonAnalize.setText("Léxico");
         buttonAnalize.setBorder(null);
         buttonAnalize.setBorderPainted(false);
         buttonAnalize.addActionListener(new java.awt.event.ActionListener() {
@@ -264,18 +266,31 @@ public class MainForm extends javax.swing.JFrame {
         labelCords.setForeground(new java.awt.Color(250, 231, 88));
         labelCords.setText("Ln: 1 Col: 1");
 
+        buttonAnalize1.setBackground(new java.awt.Color(46, 41, 46));
+        buttonAnalize1.setForeground(new java.awt.Color(250, 231, 88));
+        buttonAnalize1.setText("Sintáctico");
+        buttonAnalize1.setBorder(null);
+        buttonAnalize1.setBorderPainted(false);
+        buttonAnalize1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonAnalize1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(buttonAnalize, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(41, 41, 41)
+                .addComponent(buttonAnalize, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(buttonAnalize1, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(labelCords)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 71, Short.MAX_VALUE)
                 .addComponent(buttonSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(textWordSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(textWordSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -284,12 +299,11 @@ public class MainForm extends javax.swing.JFrame {
                 .addGap(9, 9, 9)
                 .addComponent(labelCords, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(3, 3, 3)
-                .addComponent(buttonSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(1, 1, 1)
                 .addComponent(textWordSearch))
             .addComponent(buttonAnalize, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(buttonAnalize1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(buttonSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         jPanel2.setBackground(new java.awt.Color(46, 41, 46));
@@ -463,6 +477,18 @@ public class MainForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_buttonSearchActionPerformed
     
+    
+    private void analizeSintaxis(){
+        ArrayList<Token> tokens = Automaton.getAutomaton().getTokens();
+        ArrayList<Token> errors = Automaton.getAutomaton().getErrors();
+        if(tokens.size() > 0 && errors.size() == 0){
+            PDA automaton = PDA.getAutomaton(tokens);
+            automaton.analize();
+            System.out.println(automaton.getError());
+        }else{
+            JOptionPane.showMessageDialog(null, "El análisis léxico debe completarse (sin errores)");
+        }
+    }
     private void buttonAnalizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAnalizeActionPerformed
         // TODO add your handling code here:  
         //analize();
@@ -473,9 +499,15 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
         saveFile();
     }//GEN-LAST:event_menuSaveActionPerformed
+
+    private void buttonAnalize1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAnalize1ActionPerformed
+        // TODO add your handling code here:
+        analizeSintaxis();
+    }//GEN-LAST:event_buttonAnalize1ActionPerformed
    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonAnalize;
+    private javax.swing.JButton buttonAnalize1;
     private javax.swing.JButton buttonCloseTextFound;
     private javax.swing.JButton buttonSearch;
     private javax.swing.JMenuBar jMenuBar1;

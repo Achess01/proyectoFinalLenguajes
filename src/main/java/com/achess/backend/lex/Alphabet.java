@@ -1,4 +1,4 @@
-package com.achess.backend;
+package com.achess.backend.lex;
 /**
  *
  * @author achess

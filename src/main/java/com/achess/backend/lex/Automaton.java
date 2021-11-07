@@ -1,5 +1,7 @@
-package com.achess.backend;
+package com.achess.backend.lex;
 
+import com.achess.backend.Token;
+import com.achess.backend.TokenType;
 import java.util.ArrayList;
 
 /**
@@ -133,8 +135,24 @@ public class Automaton implements Automatons{
                     if((aux.getTokenType().equals(TokenType.NUMERO)||aux.getTokenType().equals(TokenType.IDENTIFICADOR)) && 
                             (character == ')' || character == '+' 
                             || character == '*' || character == '=')){
+                        
                         addToken(aux.getTokenType(), lexeme, row, column-1, index-1);
-                        addToken(TokenType.PARENTESIS_C, String.valueOf(character), row, column, index);
+                        TokenType tk = TokenType.EPSILON;
+                        switch(character){
+                            case ')':
+                                tk = TokenType.PARENTESIS_C;
+                                break;
+                            case '+': 
+                                tk = TokenType.SUMA;
+                                break;
+                            case '*': 
+                                tk = TokenType.MULTIPLICACION;
+                                break;
+                            case '=': 
+                                tk = TokenType.ASIGNACION;
+                                break;
+                        }
+                        addToken(tk, String.valueOf(character), row, column, index);
                     }else{                        
                         lexeme += character;
                         String des = aux.nextValues();
@@ -145,12 +163,12 @@ public class Automaton implements Automatons{
                 }
                 else if(aux1.equals(q0) && !aux.equals(q0)){                
                     if(aux.isAcceptState()){
-                        addToken(aux.getTokenType(), lexeme, row, column, index);
+                        addToken(aux.getTokenType(), lexeme, row, column-1, index);
                     }
                     else{                        
                         lexeme += character;
                         String des = aux.nextValues();
-                        addTokenError(lexeme, row, column, des, index);
+                        addTokenError(lexeme, row, column-1, des, index);
                     }
                     lexeme = "";
                     aux1 = q0;
