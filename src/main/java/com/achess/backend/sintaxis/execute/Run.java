@@ -44,16 +44,34 @@ public class Run {
             String symbol = searchNode.getSymbol();
             if(symbol.equals("E")){
                 Escribir e = searchEscribir(searchNode);                       
-                instructions.add(e);                                        
+                if (e != null) instructions.add(e);                                        
             }            
             else if(symbol.equals("A")){
                 Asignar a = searchAsignar(searchNode);
                 symbolTable.put(a.getId(),a.getValue());
+            }else if(symbol.equals("R")){
+                Repetir r = searchRepetir(searchNode);
+                if (r != null) instructions.add(r);
             }
             searchNode = actualNode.getLeftMostNoTerminal();            
         }                      
     }
     
+    private Repetir searchRepetir(DNode node){
+        DNode aux = node.getNode("I");
+        aux = aux.getLeftMostChild();
+        Repetir r = new Repetir(aux.getSymbol(), aux.getToken().getLexeme());
+        aux = node.getNode("EP");
+        DNode aux1 = aux;
+        while(aux1 != null){
+            Escribir e = searchEscribir(aux1);
+            if(e != null){
+                r.addEscribir(e);
+            }
+            aux1 = aux1.getNode("EP");
+        }
+        return r;
+    }
     private Asignar searchAsignar(DNode node){
         DNode aux = node.getLeftMostChild();        
         TokenType tk = aux.getToken().getType();
@@ -109,18 +127,17 @@ public class Run {
     
     private Escribir searchEscribir(DNode node){
         DNode aux = node.getLeftMostTerminal();
-        TokenType tk = aux.getToken().getType();
-        while(true){            
+        TokenType tk = null; 
+        while(aux != null){            
+            tk = aux.getToken().getType();
             if(tk == TokenType.IDENTIFICADOR ||
                 tk == TokenType.NUMERO ||
                 tk == TokenType.LITERAL){                
-                break;
+                return new Escribir(aux.getToken().getLexeme(), tk.toString());
             }                        
-            aux = node.getLeftMostTerminal();
-            tk = aux.getToken().getType();
+            aux = node.getLeftMostTerminal();            
         }
-        Escribir escribir = new Escribir(aux.getToken().getLexeme(), tk.toString());
-        return escribir;
+        return null;
     }
     
 }

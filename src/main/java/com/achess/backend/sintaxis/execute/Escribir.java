@@ -8,24 +8,29 @@ import com.achess.backend.TokenType;
  */
 public class Escribir extends Instruction{
     String type;
-    String text;
-    public Escribir(String text, String type){
-        this.text = text;
+    String value;
+    public Escribir(String value, String type){
+        this.value = value;
         this.type = type;
     }
 
     @Override
     public String run() {
+        String text = "\n";
         if(type.equals(TokenType.IDENTIFICADOR.toString())){
-            String val = String.valueOf(Run.symbolTable.get(text));
-            return val;
+            String val = String.valueOf(Run.symbolTable.get(this.value));
+            text += val;
         }
+        else{
+            text += this.value;
+        }
+        
         return text;
     }
 
     @Override
     public String toString() {
-        return "Escribir{" + "text=" + text + '}';
+        return "Escribir{" + "text=" + value + '}';
     }
     
     
