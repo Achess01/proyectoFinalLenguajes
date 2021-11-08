@@ -33,7 +33,7 @@ class Repetir extends Instruction{
     
     @Override
     public String run() {
-        String text = "\n";
+        String text = "";
         for (int i = 0; i < numericRange; i++) {            
             for(Escribir e : stmtEscribir){
                 text += e.run();

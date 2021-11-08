@@ -16,16 +16,20 @@ public class Escribir extends Instruction{
 
     @Override
     public String run() {
-        String text = "\n";
+        String text = "";
         if(type.equals(TokenType.IDENTIFICADOR.toString())){
-            String val = String.valueOf(Run.symbolTable.get(this.value));
+            Integer id = Run.symbolTable.get(this.value);
+            String val = id != null ? String.valueOf(id) : "";            
+            if(val.equals("")){
+                return "";
+            }
             text += val;
         }
         else{
             text += this.value;
         }
         
-        return text;
+        return text + "\n";
     }
 
     @Override
