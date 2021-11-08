@@ -12,7 +12,8 @@ public class DNode {
     private Token token = null;
     private String symbol;
     private DNode father = null;
-    boolean terminal;
+    private boolean evaluated = false;
+    private boolean terminal;
     public DNode(String symbol, DNode father){
         terminal = false;
         this.symbol = symbol;
@@ -39,6 +40,52 @@ public class DNode {
         return null;
     }
     
+    public DNode popNode(String symbol){
+        DNode removeNode = null;        
+        for(DNode node: children){
+            if(node.symbol.equals(symbol)){                
+                removeNode = node;                
+                break;
+            }
+        }
+        if(removeNode != null){
+            children.remove(removeNode);
+            return removeNode;
+        }
+        return null;
+    }
+    
+    public DNode getLeftMostNoTerminal(){
+        if(!terminal && !evaluated){
+            evaluated = true;
+            return this;
+        }
+        else{
+            for(DNode n : children){
+                DNode node = n.getLeftMostNoTerminal();
+                if(node != null){
+                    return node;
+                }                
+            }
+        }
+        return null;
+    }
+    
+    public DNode getLeftMostTerminal(){
+        if(terminal && !evaluated){
+            evaluated = true;
+            return this;
+        }
+        else{
+            for(DNode n : children){
+                DNode node = n.getLeftMostTerminal();
+                if(node != null){
+                    return node;
+                }                
+            }
+        }
+        return null;
+    }
     public void add(DNode nodo){
         this.children.add(nodo);
     }
@@ -69,11 +116,13 @@ public class DNode {
             ch.print();
         });
     }
+    
+    
     @Override
     public String toString() {
         String fs = father != null? father.getSymbol() : "";
         String s = token != null? token.getLexeme(): symbol;
-        return "DNode{" + "father=" + fs + ", symbol=" + s + '}';
+        return "DNode{" + "father=" + fs + ", symbol=" + s + ", terminal="+terminal + '}';
     }
     
     

@@ -107,6 +107,9 @@ public class Automaton implements Automatons{
     
     private void addToken(TokenType tokenType, String lexeme, int row, int column, int index){
         if(!tokenType.equals(TokenType.COMENTARIO)){
+            if(tokenType.equals(TokenType.LITERAL)){
+                lexeme = lexeme.replace("\"", "");
+            }
             Token tk = new Token(tokenType, lexeme, row, column, index);        
             tokens.add(tk);
         }

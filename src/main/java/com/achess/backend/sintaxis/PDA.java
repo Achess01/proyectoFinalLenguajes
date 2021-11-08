@@ -11,8 +11,7 @@ import java.util.Stack;
  */
 public class PDA {    
     private static PDA automaton;
-    private String error;    
-    private HashMap<String, Integer> symbolTable;
+    private String error;        
     ArrayList<Token> tokens;
     private PDAState q0;
     private DNode head;
@@ -109,8 +108,7 @@ public class PDA {
     }
     private void setTokens(ArrayList<Token> tokens) {
         this.tokens = tokens;        
-        this.tokens.add(new Token(TokenType.$, "$", 0,0,0));
-        symbolTable = new HashMap<String, Integer>();
+        this.tokens.add(new Token(TokenType.$, "$", 0,0,0));        
     }        
         
     public String getError() {
@@ -178,11 +176,12 @@ public class PDA {
             }
             */
            aux = aux1;
-        }        
-        runCode();
+        }                
     }
     
-    public void runCode(){
-        
+    public String runCode(){
+        Run run = Run.getRunCode();
+        String text = run.run(head);        
+        return text;
     }
 }
