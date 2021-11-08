@@ -86,6 +86,18 @@ public class DNode {
         }
         return null;
     }
+    
+    public DNode getLeftMostChild(){        
+        for(DNode n : children){            
+            if(!n.evaluated){
+                n.evaluated = true;
+                return n;
+            }                
+        }        
+        return null;
+    }
+    
+    
     public void add(DNode nodo){
         this.children.add(nodo);
     }

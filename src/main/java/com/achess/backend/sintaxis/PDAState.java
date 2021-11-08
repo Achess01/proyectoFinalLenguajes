@@ -101,7 +101,7 @@ public class PDAState {
             return stateP.state;            
         }
         else{
-            String top = stack.peek(); //REVISAR
+            String top = stack.peek();
             stateP = nextStates.get(getKey(input, top));
             if(stateP != null){
                 this.move = stateP.move;
