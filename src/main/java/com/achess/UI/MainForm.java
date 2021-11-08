@@ -489,6 +489,9 @@ public class MainForm extends javax.swing.JFrame {
                 this.textFound.setText(error);
                 showTextFound();
             }
+            else{
+                automaton.printTree();
+            }
         }else{
             JOptionPane.showMessageDialog(null, "El análisis léxico debe completarse (sin errores)");
         }

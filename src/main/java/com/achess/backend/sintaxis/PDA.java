@@ -2,6 +2,7 @@ package com.achess.backend.sintaxis;
 import com.achess.backend.Token;
 import com.achess.backend.TokenType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Stack;
 
 /**
@@ -11,9 +12,12 @@ import java.util.Stack;
 public class PDA {    
     private static PDA automaton;
     private String error;    
+    private HashMap<String, Integer> symbolTable;
     ArrayList<Token> tokens;
     private PDAState q0;
-    private PDA(){              
+    private DNode head;
+    private PDA(){
+        head = new DNode("S", null);
         error = "";
         q0 = new PDAState();
         PDAState q1 = new PDAState();
@@ -97,26 +101,35 @@ public class PDA {
         return automaton;
     }
     
+    public void printTree(){
+        System.out.println("---------------");
+        System.out.println(head);
+        head.print();
+        System.out.println("---------------");
+    }
     private void setTokens(ArrayList<Token> tokens) {
         this.tokens = tokens;        
         this.tokens.add(new Token(TokenType.$, "$", 0,0,0));
+        symbolTable = new HashMap<String, Integer>();
     }        
         
     public String getError() {
         return error;
     }
-    
-    public void analize(){
+                    
+    public void analize(){                        
+        head = new DNode("S", null);
         Stack<String> stack = new Stack<String>();        
         error = "";
         int index = 0;
         PDAState aux, aux1;
+        DNode treeAux, treeAux1;
+        treeAux = head;        
         aux = q0;        
         while(index < tokens.size()){
             aux1 = aux.getState(TokenType.EPSILON.toString(), stack);
             if(aux1 == null){
-                Token tk = tokens.get(index);
-                //System.out.println(index);
+                Token tk = tokens.get(index);                
                 aux1 = aux.getState(tk.getType().toString(), stack);                                
                 if(aux1 == null){
                     //String valid = aux.getValidInputs();
@@ -126,11 +139,34 @@ public class PDA {
                 }
                 else if(aux1.move()){
                     index++;
-                }                
+                    treeAux.setToken(tk);                    
+                }else{
+                    treeAux.addChildren(aux.getFreshProductions());
+                }
+                
+                
+                if(!stack.empty()){
+                    String top = stack.peek();
+                    treeAux1 = treeAux;
+                    while(treeAux1 != null){
+                        if(treeAux1.getNode(top) != null){
+                            treeAux = treeAux1.getNode(top);
+                            //System.out.println(top);
+                            break;
+                        }
+                        treeAux1 = treeAux1.getFather();
+                    }
+                }
+                
+                
             }
             if(stack.empty()){                            
                 break;
+            }else{
+                //System.out.println(stack);
             }
+            
+            
             /*
             if(index == tokens.size()){                
                 if(!aux1.isEndState()){
@@ -143,5 +179,10 @@ public class PDA {
             */
            aux = aux1;
         }        
+        runCode();
+    }
+    
+    public void runCode(){
+        
     }
 }

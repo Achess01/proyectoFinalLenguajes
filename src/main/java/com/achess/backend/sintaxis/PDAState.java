@@ -9,6 +9,7 @@ import java.util.Stack;
  * @author achess
  */
 public class PDAState {
+    private String[] freshProductions;
     private HashMap<String, StatePush> nextStates;
     private ArrayList<String> validInputs;
     private boolean endState;
@@ -23,6 +24,11 @@ public class PDAState {
         return move;
     }
 
+    public String[] getFreshProductions() {
+        return freshProductions;
+    }
+    
+    
     
     public boolean isEndState() {
         return endState;
@@ -80,19 +86,19 @@ public class PDAState {
         return input +","+stackPop;
     }
     
-    private void pushElements(Stack<String> stack, String stackPush[]){
-        int len = stackPush.length;
+    private void pushElements(Stack<String> stack, String stackPush[]){        
+        int len = stackPush.length;        
         for (int i = len -1; i >= 0; i--) {
-            stack.push(stackPush[i]);
+            stack.push(stackPush[i]);            
         }        
     }
-    
+   
     public PDAState getState(String input, Stack<String> stack){        
         StatePush stateP = nextStates.get(getKey(input, TokenType.EPSILON.toString()));        
         if(stateP != null){
             this.move = stateP.move;
-            pushElements(stack, stateP.stackPush);
-            return stateP.state;
+            pushElements(stack, stateP.stackPush);            
+            return stateP.state;            
         }
         else{
             String top = stack.peek(); //REVISAR
@@ -101,6 +107,7 @@ public class PDAState {
                 this.move = stateP.move;
                 stack.pop();
                 pushElements(stack, stateP.stackPush);
+                this.freshProductions = stateP.stackPush;
                 return stateP.state;
             }
         }                        
