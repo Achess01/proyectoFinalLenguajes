@@ -17,15 +17,15 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class FileText {
     private File file;
     private String text;
-    private String previusText;
+    private String previusText;    
     private String nextText;
-    private static FileText fileText;
+    private static FileText fileText;    
     private boolean changed;
     
     private FileText(){
         text = "";
         previusText = text;
-        nextText = text;
+        nextText = text;        
         changed = false;
     }
     
@@ -35,7 +35,20 @@ public class FileText {
         }
         return fileText;
     }
+
+    public boolean getChanged() {
+        return changed;
+    }
     
+    public void createNew(){
+        fileText = new FileText();
+    }
+    
+    
+    public boolean thereIsFile(){
+        if(file != null) return true;
+        return false;
+    }
     public String getPath(){
         String text = "";
         if(file != null){
@@ -51,17 +64,19 @@ public class FileText {
         changed = !this.text.equals(text);
         if(changed){
             this.nextText = text;            
-        }                
+        }else{
+            this.nextText = this.text;
+        }
         return changed;
     }
     
-    public boolean save(){
-         
+    public boolean save(){         
         if(changed){
             boolean saved = saveFile(nextText);
             if(saved){
                previusText = text;
-               text = nextText;               
+               text = nextText;   
+               changed = false;
             }else{
                 this.file = null;
             }
@@ -70,6 +85,9 @@ public class FileText {
         return false;
     }
            
+    public void changePrevAndNext(){        
+        previusText = nextText;
+    }
     public boolean openFile(){
         boolean opened = false;
         JFileChooser upload = new JFileChooser();
@@ -106,7 +124,24 @@ public class FileText {
         return opened;
     }
     
-     private File saveAs(){     
+    public boolean saveAs(){
+        boolean saved = false;
+        File nf = getNewFile();
+        if(nf != null){
+           saved = saveFile(text, nf);
+        }        
+        return saved;
+    }
+
+    public String getPreviusText() {
+        return previusText;
+    }
+
+    public String getNextText() {
+        return nextText;
+    }
+    
+    public File getNewFile(){     
             File newFile = null;
             JFileChooser save = new JFileChooser();                        
             save.showSaveDialog(null);
@@ -128,10 +163,26 @@ public class FileText {
             boolean saved = false;
             if(text.length() >= 0){
             if(this.file == null){
-                this.file = saveAs();
+                this.file = getNewFile();
             }                   
             try{
                 File file = this.file; 
+                PrintWriter pw = new PrintWriter(file.getPath());
+                pw.print(text); 
+                pw.close();       
+                saved = true;
+            }catch (FileNotFoundException | NullPointerException ex) {                
+                saved = false;
+            }                     
+        }
+            return saved;
+    }
+    
+    public boolean saveFile(String text, File nf){       
+            boolean saved = false;
+            if(text.length() >= 0){            
+            try{
+                File file = nf; 
                 PrintWriter pw = new PrintWriter(file.getPath());
                 pw.print(text); 
                 pw.close();       

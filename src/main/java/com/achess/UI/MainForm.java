@@ -70,12 +70,15 @@ public class MainForm extends javax.swing.JFrame {
     }
     
      private void openFile(){
-        FileText fileText = FileText.getFileText();
-        if(fileText.openFile()){
-            String text = fileText.getText();
-            this.textEditor.setText(text);
-            this.labelFile.setText("File: " + fileText.getPath());
-        }        
+        if(newFile()){
+            FileText fileText = FileText.getFileText();
+            if(fileText.openFile()){
+                String text = fileText.getText();
+                this.textEditor.setText(text);
+                this.labelFile.setText("File: " + fileText.getPath());
+            }
+        }
+        
     }
     
      
@@ -181,6 +184,9 @@ public class MainForm extends javax.swing.JFrame {
         menuFile = new javax.swing.JMenu();
         menuOpen = new javax.swing.JMenuItem();
         menuSave = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("ALEXEME");
@@ -358,6 +364,33 @@ public class MainForm extends javax.swing.JFrame {
         });
         menuFile.add(menuSave);
 
+        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        jMenuItem1.setText("Nuevo");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        menuFile.add(jMenuItem1);
+
+        jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        jMenuItem2.setText("Guardar como");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        menuFile.add(jMenuItem2);
+
+        jMenuItem3.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        jMenuItem3.setText("Deshacer");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        menuFile.add(jMenuItem3);
+
         jMenuBar1.add(menuFile);
 
         setJMenuBar(jMenuBar1);
@@ -388,14 +421,7 @@ public class MainForm extends javax.swing.JFrame {
 
     private void textEditorCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_textEditorCaretUpdate
         // TODO add your handling code here:
-        FileText fileText = FileText.getFileText();
-        String text = this.textEditor.getText();
-        String fileInfo = this.labelFile.getText();
-        fileInfo = fileInfo.replace("*", "");
-        if(fileText.hasChanged(text)){
-             fileInfo += "*";            
-        }        
-        this.labelFile.setText(fileInfo);
+        lookForChanges();        
         try{
             JTextArea txt = this.textEditor;
             int caretOffset = txt.getCaretPosition();
@@ -445,7 +471,16 @@ public class MainForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_buttonSearchActionPerformed
     
-    
+    private void lookForChanges(){
+        FileText fileText = FileText.getFileText();
+        String text = this.textEditor.getText();
+        String fileInfo = this.labelFile.getText();
+        fileInfo = fileInfo.replace("*", "");
+        if(fileText.hasChanged(text)){
+             fileInfo += "*";            
+        }        
+        this.labelFile.setText(fileInfo);
+    }
     private void analizeSintaxis(){
         ArrayList<Token> tokens = Automaton.getAutomaton().getTokens();
         ArrayList<Token> errors = Automaton.getAutomaton().getErrors();
@@ -459,18 +494,60 @@ public class MainForm extends javax.swing.JFrame {
             }
             else{
                 //automaton.printTree();
-                String text = automaton.runCode();
-                this.textFound.setText(text);
+                FileText ft = FileText.getFileText();
+                File fl = ft.getNewFile();                
+                String text = automaton.runCode();                
+                if(fl != null){
+                    String info = "Error";
+                    if(ft.saveFile(text, fl)){
+                        info = "Guardado con éxito en:\n"+fl.getPath();                        
+                    }
+                    JOptionPane.showMessageDialog(null, info);
+                }
                 showTextFound();
             }
         }else{
             JOptionPane.showMessageDialog(null, "El análisis léxico debe completarse (sin errores)");
         }
     }
+    
+    private boolean newFile(){
+        boolean goNextStep = false;
+        FileText ft = FileText.getFileText();
+        //boolean fl = ft.thereIsFile();
+        int op = 1; // No
+        if(ft.getChanged()){
+            op = JOptionPane.showConfirmDialog(null, "Tiene cambios sin guardar. ¿Desea guardarlos?");
+            if(op == 0){
+                ft.save();                
+            }                             
+        }
+        if(op != 2){
+            ft.createNew();
+            this.textEditor.setText("");
+            this.labelFile.setText("File: ");
+            goNextStep = true;
+        }     
+        return goNextStep;
+    }
+    
+    private void saveAs(){
+        FileText ft = FileText.getFileText();
+        if(ft.thereIsFile()){
+           ft.saveAs();
+        }
+    }
+    private void undone(){
+        FileText ft = FileText.getFileText();                
+        String text = ft.getPreviusText();
+        this.textEditor.setText(text);
+        ft.changePrevAndNext();
+        lookForChanges();
+    }
     private void buttonAnalizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAnalizeActionPerformed
         // TODO add your handling code here:  
-        //analize();
-        analizeTest();
+        analize();
+        //analizeTest();
     }//GEN-LAST:event_buttonAnalizeActionPerformed
 
     private void menuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSaveActionPerformed
@@ -482,6 +559,21 @@ public class MainForm extends javax.swing.JFrame {
         // TODO add your handling code here:
         analizeSintaxis();
     }//GEN-LAST:event_buttonAnalize1ActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+        newFile();
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+        saveAs();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        // TODO add your handling code here:
+        undone();
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonAnalize;
@@ -489,6 +581,9 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton buttonCloseTextFound;
     private javax.swing.JButton buttonSearch;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
