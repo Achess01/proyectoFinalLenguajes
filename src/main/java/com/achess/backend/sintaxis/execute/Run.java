@@ -53,8 +53,28 @@ public class Run {
                 Repetir r = searchRepetir(searchNode);
                 if (r != null) instructions.add(r);
             }
+            else if(symbol.equals("C")){
+                Si s = searchSi(searchNode);
+                if(s != null) instructions.add(s);
+            }
             searchNode = actualNode.getLeftMostNoTerminal();            
         }                      
+    }
+    
+    private Si searchSi(DNode node){
+        DNode aux = node.getNode("V");
+        aux = aux.getLeftMostChild();
+        Si s = new Si(aux.getSymbol());
+        aux = node.getNode("EP");
+        DNode aux1 = aux;
+        while(aux1 != null){
+            Escribir e = searchEscribir(aux1);
+            if(e != null){
+                s.addEscribir(e);
+            }
+            aux1 = aux1.getNode("EP");
+        }
+        return s;
     }
     
     private Repetir searchRepetir(DNode node){
@@ -92,7 +112,7 @@ public class Run {
         String op = "";        
         while(aux != null){
             String symbol = aux.getSymbol();
-            System.out.println(symbol);
+            //System.out.println(symbol);
             if(symbol.equals("O") ||symbol.equals("B") || symbol.equals("D") || symbol.equals("I")){                
                 opAuxLeft = searchOperation(aux);
                 if(op != "" && opAuxLeft != null){
@@ -102,8 +122,7 @@ public class Run {
             else if(symbol.equals("OP") ||symbol.equals("BP")){
                 opAuxRight = searchOperation(aux);
             }
-            else if (symbol.equals(TokenType.NUMERO.toString()) || symbol.equals(TokenType.IDENTIFICADOR.toString())){
-                System.out.println(aux.getToken().getLexeme());
+            else if (symbol.equals(TokenType.NUMERO.toString()) || symbol.equals(TokenType.IDENTIFICADOR.toString())){                
                 return new Operation(symbol, aux.getToken().getLexeme());
             }
             else if(symbol.equals(TokenType.SUMA.toString()) || symbol.equals(TokenType.MULTIPLICACION.toString())){

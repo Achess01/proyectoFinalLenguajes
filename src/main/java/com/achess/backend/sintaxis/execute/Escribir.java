@@ -9,6 +9,7 @@ import com.achess.backend.TokenType;
 public class Escribir extends Instruction{
     String type;
     String value;
+
     public Escribir(String value, String type){
         this.value = value;
         this.type = type;
