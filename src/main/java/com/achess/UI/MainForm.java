@@ -9,6 +9,7 @@ import com.achess.backend.lex.Automaton;
 import com.achess.backend.Token;
 import com.achess.backend.lex.WordAutomaton;
 import com.achess.backend.sintaxis.PDA;
+import com.achess.files.FileText;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
@@ -62,69 +63,19 @@ public class MainForm extends javax.swing.JFrame {
         SwingUtilities.updateComponentTreeUI(this);
     }
     private void saveFile(){        
-        String text = this.textEditor.getText();
-            if(text.length() > 0){           
-            JFileChooser save = new JFileChooser();                        
-            save.showSaveDialog(null);
-            FileWriter fw = null;
-            save.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);            
-            try{
-                File file = save.getSelectedFile();
-                if(!file.exists()){
-                    PrintWriter pw = new PrintWriter(file.getPath() + ".txt");
-                    pw.print(text); 
-                    pw.close();
-                }
-                else{
-                    JOptionPane.showConfirmDialog(null, "El archivo ya existe");
-                }
-            }catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Error al guardar, ponga nombre al archivo");
-            }
-            finally{
-                try{
-                    if(fw!=null){
-                    fw.close();
-                    }
-                }catch(Exception ex){
-                    ex.printStackTrace(System.out);
-                }                
-            }            
+        FileText fileText = FileText.getFileText();
+        if(fileText.save()){
+            this.labelFile.setText("File: " + fileText.getPath());
         }        
     }
     
      private void openFile(){
-        JFileChooser upload = new JFileChooser();
-        FileNameExtensionFilter filtro = new FileNameExtensionFilter("txt","txt");
-        upload.setFileFilter(filtro);
-        upload.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        upload.showOpenDialog(null);        
-        FileReader fr = null;
-        try{
-            File file = upload.getSelectedFile();
-            fr = new FileReader(file);
-            BufferedReader br = new BufferedReader(fr);
-            
-            String text = "";
-            String line;                     
-            while((line = br.readLine()) != null){                
-                text += line + "\n";
-            }            
+        FileText fileText = FileText.getFileText();
+        if(fileText.openFile()){
+            String text = fileText.getText();
             this.textEditor.setText(text);
-            
-        }
-        catch (Exception ex){
-            JOptionPane.showMessageDialog(null, "Error al cargar el archivo");     
-        }
-        finally{
-                try{
-                    if(fr!=null){
-                    fr.close();
-                    }
-                }catch(Exception ex){
-                    ex.printStackTrace(System.out);
-                }                
-            }
+            this.labelFile.setText("File: " + fileText.getPath());
+        }        
     }
     
      
@@ -437,6 +388,14 @@ public class MainForm extends javax.swing.JFrame {
 
     private void textEditorCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_textEditorCaretUpdate
         // TODO add your handling code here:
+        FileText fileText = FileText.getFileText();
+        String text = this.textEditor.getText();
+        String fileInfo = this.labelFile.getText();
+        fileInfo = fileInfo.replace("*", "");
+        if(fileText.hasChanged(text)){
+             fileInfo += "*";            
+        }        
+        this.labelFile.setText(fileInfo);
         try{
             JTextArea txt = this.textEditor;
             int caretOffset = txt.getCaretPosition();
@@ -516,7 +475,7 @@ public class MainForm extends javax.swing.JFrame {
 
     private void menuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSaveActionPerformed
         // TODO add your handling code here:
-        saveFile();
+        saveFile();        
     }//GEN-LAST:event_menuSaveActionPerformed
 
     private void buttonAnalize1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAnalize1ActionPerformed
