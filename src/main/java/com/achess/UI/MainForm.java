@@ -503,8 +503,7 @@ public class MainForm extends javax.swing.JFrame {
                         info = "Guardado con éxito en:\n"+fl.getPath();                        
                     }
                     JOptionPane.showMessageDialog(null, info);
-                }
-                showTextFound();
+                }                
             }
         }else{
             JOptionPane.showMessageDialog(null, "El análisis léxico debe completarse (sin errores)");
